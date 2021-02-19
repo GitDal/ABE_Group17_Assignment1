@@ -1,4 +1,4 @@
-import connect from "./models/db.js";
+import connect from "./models/db";
 import express from "express";
 import http from "http";
 
