@@ -2,10 +2,12 @@ import connect from "./models/db";
 import express from "express";
 import http from "http";
 import indexRouter from "./routes/index";
+import userRouter from "./routes/user"
 
 const app = express();
 app.use(express.json());
 app.use('/', indexRouter);
+app.use('/user', userRouter);
 
 var port = normalizePort(process.env.PORT || '3000');
 const server = http.createServer(app);

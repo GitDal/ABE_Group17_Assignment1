@@ -3,7 +3,7 @@ import mongoose from "mongoose";
 const userModelName = "User";
 
 export interface IUser {
-    claims: string; // Might change type later - Array of claimstype
+    claims?: string; // Might change type later - Array of claimstype
     email: string
     password: string;
 }
@@ -18,4 +18,5 @@ const userSchema = new mongoose.Schema({
     password: String,
 });
 
-const userModel = mongoose.model(userModelName, userSchema);
+
+export default mongoose.model(userModelName, userSchema);
