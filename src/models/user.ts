@@ -3,19 +3,20 @@ import mongoose from "mongoose";
 const userModelName = "User";
 
 export interface IUser {
-    claims?: string; // Might change type later - Array of claimstype
+    claims?: Array<string>; // Might change type later - Array of claimstype
     email: string
     password: string;
 }
 
 const userSchema = new mongoose.Schema({
-    claims: String,
     email: {
         type: String,
+        required: true,
         unique: true,
-        required: true
+        index: true
     },
     password: String,
+    claims: [String]
 });
 
 

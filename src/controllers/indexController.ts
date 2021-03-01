@@ -1,5 +1,5 @@
 import express from "express"
-import { Document } from "mongoose";
+import { Document, NativeError } from "mongoose";
 import db, { IUser } from "../models/user"
 
 export async function index(req: express.Request, res: express.Response, next: express.NextFunction) {
@@ -14,9 +14,12 @@ export async function login(req: express.Request, res: express.Response, next: e
 export async function register(req: express.Request, res: express.Response, next: express.NextFunction) {
     let userInfo: IUser = req.body;
 
-    let registeredUser = await db.create(userInfo, () => console.error(`User with email ${userInfo.email} could not be registered`));
-    
-
-    // let doc = await db.create<IUser>(students);
-    // return doc;
+    try {
+        let result = await db.create(userInfo);
+        res.status(201);
+        res.json(result.id);
+    } catch (error) {
+        res.status(400);
+        res.send(error.message);
+    }
 }
