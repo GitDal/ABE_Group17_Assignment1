@@ -12,7 +12,7 @@ const swaggerDefinition: SwaggerJSDoc.SwaggerDefinition = {
             email: '201805606@uni.au.dk'
         },
         servers: [{
-            url: `http://localhost:3000`,
+            url: 'http://localhost:3000',
             description: 'Development server'
         }]
     },
@@ -20,7 +20,7 @@ const swaggerDefinition: SwaggerJSDoc.SwaggerDefinition = {
 const options: SwaggerJSDoc.Options = {
     definition: swaggerDefinition,
     //Path to files containing OpenAPI definitions
-    apis: ['./routes/*.js'] //skal måske pege på controllers (og med .ts istedet?)
+    apis: ['**/*.ts'] //skal måske pege på controllers (og med .ts istedet?)
 }
 const swaggerSpec = SwaggerJSDoc(options);
 

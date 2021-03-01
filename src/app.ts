@@ -10,7 +10,7 @@ const app = express();
 app.use(express.json());
 app.use('/', indexRouter);
 app.use('/user', userRouter);
-app.use('/swagger', SwaggerUi.setup(swaggerSpec));
+app.use('/swagger', SwaggerUi.serve, SwaggerUi.setup(swaggerSpec));
 
 var port = normalizePort(process.env.PORT || '3000');
 const server = http.createServer(app);
