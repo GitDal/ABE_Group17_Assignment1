@@ -1,11 +1,14 @@
+import dotenv from "dotenv";
+dotenv.config(); //Has to be called before any other imports
+
 import connect from "./models/db";
 import express from "express";
 import http from "http";
 import indexRouter from "./routes/index";
 import hotelRouter from "./routes/hotel";
 import userRouter from "./routes/user"
-import SwaggerUi from 'swagger-ui-express';
-import swaggerSpec from './swaggerSetup'
+import SwaggerUi from "swagger-ui-express";
+import swaggerSpec from "./swaggerSetup";
 
 const app = express();
 app.use(express.json());

@@ -1,14 +1,11 @@
 import express from "express"
 import bcrypt from "bcrypt";
 import { MongoError } from "mongodb";
-import db, { IUser } from "../models/user"
-import { Document } from "mongoose";
+import db, { IUser } from "../models/user";
+import jwt from "jsonwebtoken";
 
 const saltRounds = 10;
-
-export async function index(req: express.Request, res: express.Response, next: express.NextFunction) {
-    res.status(200).send("HEJ HEJ");
-}
+const secret = process.env.JWT_SECRET as string;
 
 export async function login(req: express.Request, res: express.Response, next: express.NextFunction) {
     let userInfo: IUser = req.body;
@@ -20,9 +17,14 @@ export async function login(req: express.Request, res: express.Response, next: e
         let correctPassword = await bcrypt.compare(userInfo.password, userFromDb.password);
 
         if (correctPassword) {
-            
-            //Return jwt
-
+            let token = jwt.sign({email: userInfo.email}, secret, {
+                expiresIn: "1h"
+            });
+    
+            res.status(200).json({
+                message: "Succesfully logged in",
+                token: token
+            });
         } else {
             res.status(400);
             res.send("Incorrect email or password");
@@ -48,8 +50,15 @@ export async function register(req: express.Request, res: express.Response, next
         };
 
         await db.create<IUser>(hashedUserInfo);
-        res.status(201);
-        res.send("Succesfully registered");
+        
+        let token = jwt.sign({email: hashedUserInfo.email}, secret, {
+            expiresIn: "1h"
+        });
+
+        res.status(201).json({
+            message: "Succesfully registered",
+            token: token
+        });
     } catch (error) {
         let err = error as MongoError
         res.status(400);
