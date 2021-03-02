@@ -16,6 +16,6 @@ router.route('/:hotelId/room/:roomNumber')
     .get(hotelController.getRoom)
     .put(hotelController.reserveRoom);
 
-router.get('/:hotelId/room/available', hotelController.getAvailableRooms);
+router.get('/:hotelId/available', hotelController.getAvailableRooms);
 
 export default router;
