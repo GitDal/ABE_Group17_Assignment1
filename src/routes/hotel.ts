@@ -26,7 +26,48 @@ router.post('/', hotelController.createHotel)
  *  get:
  *    summary: Get a single specified hotel document.
  *    description: Document contains all of that hotels rooms and the hotel's manager's ID.
-*/
+ *    responses:
+ *      200:
+ *        description: A hotel document.
+ *        content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                _id:
+ *                  type: string
+ *                  description: Hotel identifier.
+ *                  example: "603d2d13928e1485b4f0de9f"
+ *                hotelManagerId:
+ *                  type: string
+ *                  description: Hotel manager identifier.
+ *                  example: "MaryManyMoney@Chardonne.com"
+ *                name:
+ *                  type: string
+ *                  description: The name of the hotel.
+ *                  example: "Chardonne Five Star Hotel"
+ *                address:
+ *                  type: string
+ *                  description: The address of the hotel.
+ *                  example: "Fisherstreet 420, London, UK"
+ *                rooms:
+ *                  type: array
+ *                  items:
+ *                    type: object
+ *                    properties:'
+ *                      roomNumber:
+ *                        type: integer
+ *                        description: The number of the room, must be unique.
+ *                        example: 69
+ *                      available:
+ *                        type: boolean
+ *                        description: Whether or not a room is available to reserve.
+ *                        example: false
+ *                      reservedByUserId:
+ *                        type: string
+ *                        description: ID of user who has reserved the room, empty if not reserved.
+ *                        example: "mikkeljeppe@gmail.com"
+ */
 router.get('/:hotelId', hotelController.getHotel);
 
 /**
