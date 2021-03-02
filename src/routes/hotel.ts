@@ -2,23 +2,20 @@ import express from "express";
 import * as hotelController from "../controllers/hotelController";
 const router = express.Router();
 
-router.get('/:hotelId', hotelController.getHotel);
-
-router.get('/room/available/:hotelId', hotelController.getAvailableRooms);
-
-
-router.route('/room/:hotelId')
-.get(hotelController.getAllRoomsInHotel)
-.post(hotelController.createRoom);
-
-
 router.route('/')
     .get(hotelController.getAllHotels)
     .post(hotelController.createHotel);
 
-router.route('/room/:hotelId/:roomNumber')
+router.get('/:hotelId', hotelController.getHotel);
+
+router.route('/:hotelId/room')
+    .get(hotelController.getAllRoomsInHotel)
+    .post(hotelController.createRoom);
+
+router.route('/:hotelId/room/:roomNumber')
     .get(hotelController.getRoom)
     .put(hotelController.reserveRoom);
 
+router.get('/:hotelId/room/available', hotelController.getAvailableRooms);
 
 export default router;
