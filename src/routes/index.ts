@@ -5,15 +5,6 @@ const router = express.Router();
 
 /**
  * @swagger
- * /:
- *  get:
- *    summary: Home-page.
- *    description: Get a sweet message!
-*/
-router.get('/', indexController.index);
-
-/**
- * @swagger
  * /login:
  *  post:
  *    summary: User Login.

@@ -46,7 +46,7 @@ export async function register(req: express.Request, res: express.Response, next
         const hashedUserInfo: IUser = {
             email: userInfo.email,
             password: hashedPassword,
-            claims: userInfo.claims
+            claims: []
         };
 
         await db.create<IUser>(hashedUserInfo);
