@@ -19,6 +19,4 @@ const userSchema = new mongoose.Schema({
     claims: [String]
 });
 
-
-const userModel = mongoose.model(userModelName, userSchema);
-export default userModel;
+export default mongoose.model(userModelName, userSchema);
