@@ -7,7 +7,7 @@ import { Document } from "mongoose";
 const saltRounds = 10;
 
 export async function index(req: express.Request, res: express.Response, next: express.NextFunction) {
-    res.status(200).send("HEJ HEJ");
+    res.status(200).send("You're beautiful!");
 }
 
 export async function login(req: express.Request, res: express.Response, next: express.NextFunction) {
