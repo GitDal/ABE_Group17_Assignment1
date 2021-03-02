@@ -54,7 +54,7 @@ router.post('/', hotelController.createHotel)
  *                  type: array
  *                  items:
  *                    type: object
- *                    properties:'
+ *                    properties:
  *                      roomNumber:
  *                        type: integer
  *                        description: The number of the room, must be unique.
