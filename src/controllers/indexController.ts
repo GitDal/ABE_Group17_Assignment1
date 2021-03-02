@@ -3,7 +3,7 @@ import bcrypt from "bcrypt";
 import { MongoError } from "mongodb";
 import db, { IUser } from "../models/user";
 import jwt from "jsonwebtoken";
-import CLAIMS from "../constants";
+import claims from "../claims";
 
 const saltRounds = 10;
 const secret = process.env.JWT_SECRET as string;
@@ -45,7 +45,7 @@ export async function register(req: express.Request, res: express.Response, next
         const hashedUserInfo: IUser = {
             email: userInfo.email,
             password: hashedPassword,
-            claims: [CLAIMS.USER]
+            claims: [claims.USER]
         };
 
         await db.create<IUser>(hashedUserInfo);

@@ -1,5 +1,5 @@
 import express from "express"
-import { Document, Query } from "mongoose";
+import { Document } from "mongoose";
 import hotelModel, {IHotel, IRoom} from "../models/hotel"
 
 

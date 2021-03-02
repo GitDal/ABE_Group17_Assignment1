@@ -1,8 +1,5 @@
 import express from "express"
 import db, {IUserDoc} from "../models/user";
-import systemClaims from "../claims";
-import { Document } from "mongoose";
-
 
 export async function giveClaims(req: express.Request, res: express.Response, next: express.NextFunction) {
     let userEmail: string = req.body.user;
