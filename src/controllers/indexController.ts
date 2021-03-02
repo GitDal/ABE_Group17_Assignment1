@@ -26,13 +26,11 @@ export async function login(req: express.Request, res: express.Response, next: e
                 token: token
             });
         } else {
-            res.status(400);
-            res.send("Incorrect email or password");
+            res.status(400).json({message: "Incorrect email or password"});
         }
 
     } catch (error) {
-        res.status(400);
-        res.send("Incorrect email or password");
+        res.status(400).json({message: "Incorrect email or password"});
     }
 
 }
