@@ -108,11 +108,11 @@ router.put('/:hotelId/room/:roomNumber', hotelController.reserveRoom)
 
 /**
  * @swagger
- * /:hotelId/room/available:
+ * /:hotelId/available:
  *  get:
  *    summary: Get all available rooms in a specified hotel.
  *    description: Get all available rooms in a specified hotel.
 */
-router.get('/:hotelId/room/available', hotelController.getAvailableRooms);
+router.get('/:hotelId/available', hotelController.getAvailableRooms);
 
 export default router;

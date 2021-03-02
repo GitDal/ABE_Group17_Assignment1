@@ -4,9 +4,9 @@ const Schema = mongoose.Schema;
 const hotelModelName = "Hotel";
 
 export interface IRoom{
-    hotelId: number;
+    roomNumber: Number
     available: boolean;
-    reservedByUserId: number;
+    reservedByUserId: String; //Email
 }
 
 export interface IHotel {
@@ -19,14 +19,13 @@ export interface IHotel {
 const roomSchema = new Schema({
     roomNumber: {
         type: Number,
-        required: true,
-        unique: true
+        required: true
     },
     available: {
         type: Boolean,
         'default': true,
     },
-    reservedByUserId: Number
+    reservedByUserId: String //Email
 });
 
 const hotelSchema = new Schema({
@@ -35,6 +34,5 @@ const hotelSchema = new Schema({
     address: String,
     rooms: [roomSchema]
 });
-
 
 export default mongoose.model(hotelModelName, hotelSchema);
