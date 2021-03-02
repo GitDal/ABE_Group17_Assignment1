@@ -1,5 +1,5 @@
 import express from "express"
-import { Document, NativeError } from "mongoose";
+import { MongoError } from "mongodb";
 import db, { IUser } from "../models/user"
 
 export async function index(req: express.Request, res: express.Response, next: express.NextFunction) {
@@ -19,7 +19,12 @@ export async function register(req: express.Request, res: express.Response, next
         res.status(201);
         res.json(result.id);
     } catch (error) {
+        let err = error as MongoError
         res.status(400);
-        res.send(error.message);
+        if (err.code == 11000) { // Email duplication error
+            res.send("Email already registered");
+        } else {
+            res.send(err.message);
+        }
     }
 }
