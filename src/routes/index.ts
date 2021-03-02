@@ -8,7 +8,7 @@ const router = express.Router();
  * /:
  *  get:
  *    summary: Home-page.
- *    description: see homepage... 
+ *    description: Get a sweet message!
 */
 router.get('/', indexController.index);
 
@@ -17,7 +17,7 @@ router.get('/', indexController.index);
  * /login:
  *  post:
  *    summary: User Login.
- *    description: login... 
+ *    description: Login with user credentials.
 */
 router.post('/login', indexController.login);
 
@@ -26,7 +26,7 @@ router.post('/login', indexController.login);
  * /register:
  *  post:
  *    summary: Register a new User.
- *    description: register... 
+ *    description: Register a new user with email and password. 
 */
 router.post('/register', indexController.register);
 
