@@ -14,6 +14,10 @@ export async function createHotel(req: express.Request , res: express.Response, 
     
     const hotel: IHotel = req.body
 
+    // userId via webToken
+    const user = req.user as {email: string};
+    hotel.hotelManagerId = user.email;
+
     try {
         const result = await hotelModel.create(hotel); 
         res.status(201).send(result);
@@ -51,13 +55,22 @@ export async function createRoom(req: express.Request , res: express.Response, n
     const hotelId = req.params.hotelId;
     const room: IRoom = req.body;
 
+    // userId via webToken
+    const user = req.user as {email: string};
+    const requestingHotelManagerId = user.email;
+
     try {
+        const hotel = await hotelModel.findOne({_id: req.params.hotelId, "hotelManagerId": requestingHotelManagerId});
+        if(!hotel) {
+            res.status(401).send("Unauthorized: The given hotel has another hotelManager!")
+        }
+
         const result = await hotelModel.updateOne(
             {_id: req.params.hotelId, 'rooms.roomNumber': {$ne: room.roomNumber}}, //roomNumber has to be unique in hotel (but not in all hotels)
             {$push: {"rooms": room}}); 
 
         if(result.nModified === 0){
-            res.status(200).send(`Room with roomNumber=${room.roomNumber} couldn't be created... \nInfo: Maybe it already exists or the hotel with id=${hotelId} doesn't exist`)
+            res.status(200).send(`Room with roomNumber=${room.roomNumber} couldn't be created... \nInfo: Either the room (${room.roomNumber}) already exists or the hotel (${hotelId}) doesn't exist`)
         } else {
             res.status(201).send(result);
         }
@@ -101,8 +114,9 @@ export async function reserveRoom(req: express.Request , res: express.Response, 
     const hotelId = req.params.hotelId;
     const roomNumber = req.params.roomNumber;
 
-    //body
-    const reservedByUserId = req.body.reservedByUserId;
+    // userId via webToken
+    const user = req.user as {email: string};
+    const reservedByUserId = user.email;
     
     try {
         let result = await hotelModel.updateOne(

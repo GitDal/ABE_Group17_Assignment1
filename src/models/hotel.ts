@@ -6,11 +6,11 @@ const hotelModelName = "Hotel";
 export interface IRoom{
     roomNumber: Number
     available: boolean;
-    reservedByUserId: String; //Email
+    reservedByUserId: String; //user.Email
 }
 
 export interface IHotel {
-    hotelManagerId: number;
+    hotelManagerId: String; //user.Email
     name: string;
     address: string;
     rooms: Array<IRoom>
@@ -25,11 +25,11 @@ const roomSchema = new Schema({
         type: Boolean,
         'default': true,
     },
-    reservedByUserId: String //Email
+    reservedByUserId: String //user.Email
 });
 
 const hotelSchema = new Schema({
-    hotelManagerId: Number,
+    hotelManagerId: String,
     name: String,
     address: String,
     rooms: [roomSchema]
