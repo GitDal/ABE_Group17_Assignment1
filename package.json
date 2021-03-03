@@ -6,7 +6,8 @@
   "scripts": {
     "start": "node dist/app.js",
     "serve": "tsc && nodemon dist/app.js",
-    "postinstall": "npm run tsc"
+    "postinstall": "tsc",
+    "deployz": "git add . && git commit -m 'Heroku' && git push heroku master"
   },
   "engines": {
     "node": "^14.15.4",
@@ -15,7 +16,6 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "tsc": "tsc",
     "bcrypt": "^5.0.1",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
