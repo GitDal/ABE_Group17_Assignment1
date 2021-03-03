@@ -4,9 +4,8 @@
   "description": "",
   "main": "dist/app.js",
   "scripts": {
-    "start": "node dist/app.js",
+    "start": "tsc && node dist/app.js",
     "serve": "tsc && nodemon dist/app.js",
-    "postinstall": "tsc",
     "deployz": "git add . && git commit -m 'Heroku' && git push heroku master"
   },
   "engines": {
