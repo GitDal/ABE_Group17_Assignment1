@@ -223,9 +223,9 @@ router.route('/:hotelId/room')
  *      404:
  *        description: Room not Found
  *  put:
- *    summary: Change the availability of a specified room in a specified hotel.
+ *    summary: Reserve the specified room in a specified hotel.
  *    tags: [Rooms]
- *    description: Change the availability of a specified room in a specified hotel.
+ *    description: Reserve the specified room in a specified hotel.
  *    parameters:
  *      - in: path
  *        name: hotelId
