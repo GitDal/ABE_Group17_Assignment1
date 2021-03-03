@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 //const url = 'mongodb://localhost:27017/ABE';
 // For heroku deployment:
-const url = "mongodb+srv://admin:admin123@abe-assignment1-databas.rabnd.mongodb.net/ABE?retryWrites=true&w=majority";
+const url = process.env.DB_CONNECTION_STRING as string;
 
 async function connect() {
     try {
