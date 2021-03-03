@@ -12,12 +12,17 @@ export async function getAllHotels(req: express.Request , res: express.Response,
 // POST /
 export async function createHotel(req: express.Request , res: express.Response, next: express.NextFunction) {
     
-    let hotel: IHotel = req.body
+    const hotel: IHotel = req.body
+
+    // userId via webToken
+    const user = req.user as {email: string};
+    hotel.hotelManagerId = user.email;
 
     try {
         const result = await hotelModel.create(hotel); 
         res.status(201).send(result);
     } catch (error) {
+        printError("createHotel", error)
         res.status(400).send(error.message)
     }
 }
@@ -28,6 +33,7 @@ export async function getHotel(req: express.Request , res: express.Response, nex
         const hotel = await hotelModel.findById({_id: req.params.hotelId}); 
         res.status(200).send(hotel);
     } catch (error) {
+        printError("getHotel", error)
         res.status(404).send(error.message)
     }
 }
@@ -38,6 +44,7 @@ export async function getAllRoomsInHotel(req: express.Request , res: express.Res
         const rooms = await hotelModel.findById({_id: req.params.hotelId}).select("rooms"); 
         res.status(200).send(rooms);
     } catch (error) {
+        printError("getAllRoomsInHotel", error)
         res.status(404).send(error.message)
     }
 }
@@ -45,15 +52,30 @@ export async function getAllRoomsInHotel(req: express.Request , res: express.Res
 // POST /room/{hotelId}
 export async function createRoom(req: express.Request , res: express.Response, next: express.NextFunction) {
     
+    const hotelId = req.params.hotelId;
+    const room: IRoom = req.body;
 
-    let room: IRoom = req.body;
+    // userId via webToken
+    const user = req.user as {email: string};
+    const requestingHotelManagerId = user.email;
 
     try {
+        const hotel = await hotelModel.findOne({_id: req.params.hotelId, "hotelManagerId": requestingHotelManagerId});
+        if(!hotel) {
+            res.status(401).send("Unauthorized: The given hotel has another hotelManager!")
+        }
+
         const result = await hotelModel.updateOne(
-            {_id: req.params.hotelId},
+            {_id: req.params.hotelId, 'rooms.roomNumber': {$ne: room.roomNumber}}, //roomNumber has to be unique in hotel (but not in all hotels)
             {$push: {"rooms": room}}); 
-        res.status(201).send(result);
+
+        if(result.nModified === 0){
+            res.status(200).send(`Room with roomNumber=${room.roomNumber} couldn't be created... \nInfo: Either the room (${room.roomNumber}) already exists or the hotel (${hotelId}) doesn't exist`)
+        } else {
+            res.status(201).send(result);
+        }
     } catch (error) {
+        printError("createRoom", error)
         res.status(400).send(error.message);
     }
 }
@@ -61,35 +83,84 @@ export async function createRoom(req: express.Request , res: express.Response, n
 // GET /{hotelId}/room/{roomNumber}
 export async function getRoom(req: express.Request , res: express.Response, next: express.NextFunction) {
 
+    // params
+    const hotelId = req.params.hotelId;
+    const roomNumber = req.params.roomNumber;
+
     try {
-        const room = await hotelModel.find({_id: req.params.hotelId}, {"rooms": { $elemMatch: { "roomNumber": req.params.roomNumber} } });
+        let result = await hotelModel.findOne({_id: hotelId}, {"rooms": { $elemMatch: { "roomNumber": roomNumber}}});
+        
+        let roomResult = result?.toObject() as IHotel;
+        if(!roomResult) {
+            res.status(404).send(`The hotel with id=${hotelId} doesn't exist`)
+        }
+
+        let room = roomResult.rooms[0];
+        if(!room) {
+            res.status(404).send(`The room with roomNumber=${roomNumber} doesn't exist`)
+        }
+
         res.status(200).send(room);
     } catch (error) {
+        printError("getRoom", error)
         res.status(400).send(error.message)
     }
 }
 
 // PUT {hotelId}/room/{roomNumber}
 export async function reserveRoom(req: express.Request , res: express.Response, next: express.NextFunction) {
+    
+    //params
+    const hotelId = req.params.hotelId;
+    const roomNumber = req.params.roomNumber;
+
+    // userId via webToken
+    const user = req.user as {email: string};
+    const reservedByUserId = user.email;
+    
     try {
-        const availableRooms = await hotelModel.updateOne(
-            {_id: req.params.hotelId, "rooms.roomNumber" : req.params.roomNumber, "rooms.available": true},
-            {$set: {"rooms.available" : false, "rooms.reservedByUserId" : req.body.reservedByUserId}});
-            res.status(200).send(`Reserved room number ${req.params.roomNumber}!`);
+        let result = await hotelModel.updateOne(
+            {_id: hotelId, "rooms": { $elemMatch: { "roomNumber": roomNumber, "available": true}}},
+            {$set: {"rooms.$.available" : false, "rooms.$.reservedByUserId" : reservedByUserId}});
+
+        if(result.nModified === 0){
+            res.status(200).send(`Room with roomNumber=${roomNumber} couldn't be reserved (maybe its already reserved)`)
+        } else {
+            res.status(200).send(`Reserved room with roomNumber ${roomNumber}!`);
+        }
+        
     } catch (error) {
+        printError("reserveRoom", error)
         res.status(400).send(error.message);
     }
 }
 
 // GET /{hotelId}/room/available
 export async function getAvailableRooms(req: express.Request , res: express.Response, next: express.NextFunction) {
+    
+    //params
+    const hotelId = req.params.hotelId;
+
     try {
-        var filter = {'rooms.available': true}
-        const availableRooms = await hotelModel.findById({_id: req.params.hotelId}).select(filter); 
+        const result = await hotelModel.findById({_id: hotelId}).select("rooms");
+
+        const hotelWithRooms = result?.toObject() as IHotel;
+        if(!hotelWithRooms || hotelWithRooms == undefined) {
+            res.status(404).send(`The hotel with id=${hotelId} doesn't exist`)
+        }
+
+        const availableRooms = hotelWithRooms.rooms.filter(r => r.available == true);
+
         res.status(200).send(availableRooms);
     } catch (error) {
+        printError("getAvailableRooms", error)
         res.status(404).send(error.message)
     }
+}
+
+function printError(functionName: string, error: any) {
+    console.log(`** Error from function ${functionName}:`)
+    console.log(error);
 }
 
 

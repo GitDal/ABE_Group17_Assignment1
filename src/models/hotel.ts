@@ -4,13 +4,13 @@ const Schema = mongoose.Schema;
 const hotelModelName = "Hotel";
 
 export interface IRoom{
-    hotelId: number;
+    roomNumber: Number
     available: boolean;
-    reservedByUserId: number;
+    reservedByUserId: String; //user.Email
 }
 
 export interface IHotel {
-    hotelManagerId: number;
+    hotelManagerId: String; //user.Email
     name: string;
     address: string;
     rooms: Array<IRoom>
@@ -19,22 +19,20 @@ export interface IHotel {
 const roomSchema = new Schema({
     roomNumber: {
         type: Number,
-        required: true,
-        unique: true
+        required: true
     },
     available: {
         type: Boolean,
         'default': true,
     },
-    reservedByUserId: Number
+    reservedByUserId: String //user.Email
 });
 
 const hotelSchema = new Schema({
-    hotelManagerId: Number,
+    hotelManagerId: String,
     name: String,
     address: String,
     rooms: [roomSchema]
 });
-
 
 export default mongoose.model(hotelModelName, hotelSchema);

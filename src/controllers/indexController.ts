@@ -3,6 +3,7 @@ import bcrypt from "bcrypt";
 import { MongoError } from "mongodb";
 import db, { IUser } from "../models/user";
 import jwt from "jsonwebtoken";
+import claims from "../claims";
 
 const saltRounds = 10;
 const secret = process.env.JWT_SECRET as string;
@@ -26,13 +27,11 @@ export async function login(req: express.Request, res: express.Response, next: e
                 token: token
             });
         } else {
-            res.status(400);
-            res.send("Incorrect email or password");
+            res.status(400).json({message: "Incorrect email or password"});
         }
 
     } catch (error) {
-        res.status(400);
-        res.send("Incorrect email or password");
+        res.status(400).json({message: "Incorrect email or password"});
     }
 
 }
@@ -46,7 +45,7 @@ export async function register(req: express.Request, res: express.Response, next
         const hashedUserInfo: IUser = {
             email: userInfo.email,
             password: hashedPassword,
-            claims: []
+            claims: [claims.USER]
         };
 
         await db.create<IUser>(hashedUserInfo);

@@ -1,5 +1,8 @@
 import express from "express";
 import * as hotelController from "../controllers/hotelController";
+import authorize from "./authorize";
+import claims from "../claims";
+
 const router = express.Router();
 
 /**
@@ -9,7 +12,7 @@ const router = express.Router();
  *    summary: Get a every hotel document with all their rooms.
  *    description: Each hotel document contains an array of rooms.
 */
-router.get('/', hotelController.getAllHotels)
+router.get('/', authorize([claims.USER]), hotelController.getAllHotels)
 
 /**
  * @swagger
@@ -18,7 +21,7 @@ router.get('/', hotelController.getAllHotels)
  *    summary: Add a new empty hotel document to the database.
  *    description: Add a new empty hotel document to the database.
 */
-router.post('/', hotelController.createHotel)
+router.post('/', authorize([claims.HOTEL_MANAGER]), hotelController.createHotel)
 
 /**
  * @swagger
@@ -68,7 +71,7 @@ router.post('/', hotelController.createHotel)
  *                        description: ID of user who has reserved the room, empty if not reserved.
  *                        example: "mikkeljeppe@gmail.com"
  */
-router.get('/:hotelId', hotelController.getHotel);
+router.get('/:hotelId', authorize([claims.USER]), hotelController.getHotel);
 
 /**
  * @swagger
@@ -77,7 +80,7 @@ router.get('/:hotelId', hotelController.getHotel);
  *    summary: Get an array of every room in a given hotel.
  *    description: Get an array of every room in a given hotel.
 */
-router.get('/:hotelId/room', hotelController.getAllRoomsInHotel);
+router.get('/:hotelId/room', authorize([claims.USER]), hotelController.getAllRoomsInHotel);
 
 /**
  * @swagger
@@ -86,7 +89,7 @@ router.get('/:hotelId/room', hotelController.getAllRoomsInHotel);
  *    summary: Insert a new room in the specified hotel document.
  *    description: Room should include roomNumber, availability and a reservedByUserId. 
 */
-router.post('/:hotelId/room', hotelController.createRoom);
+router.post('/:hotelId/room', authorize([claims.HOTEL_MANAGER]), hotelController.createRoom);
 
 /**
  * @swagger
@@ -95,7 +98,7 @@ router.post('/:hotelId/room', hotelController.createRoom);
  *    summary: Get a specified room in a specified hotel.
  *    description: Get a specified room in a specified hotel.
 */
-router.get('/:hotelId/room/:roomNumber', hotelController.getRoom);
+router.get('/:hotelId/room/:roomNumber', authorize([claims.USER]), hotelController.getRoom);
 
 /**
  * @swagger
@@ -104,15 +107,15 @@ router.get('/:hotelId/room/:roomNumber', hotelController.getRoom);
  *    summary: Change the availability of a specified room in a specified hotel.
  *    description: Change the availability of a specified room in a specified hotel.
 */
-router.put('/:hotelId/room/:roomNumber', hotelController.reserveRoom)
+router.put('/:hotelId/room/:roomNumber', authorize([claims.USER]), hotelController.reserveRoom)
 
 /**
  * @swagger
- * /:hotelId/room/available:
+ * /:hotelId/available:
  *  get:
  *    summary: Get all available rooms in a specified hotel.
  *    description: Get all available rooms in a specified hotel.
 */
-router.get('/:hotelId/room/available', hotelController.getAvailableRooms);
+router.get('/:hotelId/available', authorize([claims.USER]), hotelController.getAvailableRooms);
 
 export default router;
