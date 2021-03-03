@@ -3,7 +3,7 @@ import bcrypt from "bcrypt";
 import { MongoError } from "mongodb";
 import db, { IUser } from "../models/user";
 import jwt from "jsonwebtoken";
-import CLAIMS from "../constants";
+import claims from "../claims";
 
 const saltRounds = 10;
 const secret = process.env.JWT_SECRET as string;
@@ -18,20 +18,20 @@ export async function login(req: express.Request, res: express.Response, next: e
         let correctPassword = await bcrypt.compare(userInfo.password, userFromDb.password);
 
         if (correctPassword) {
-            let token = jwt.sign({email: userInfo.email}, secret, {
+            let token = jwt.sign({ email: userInfo.email }, secret, {
                 expiresIn: "1h"
             });
-    
+
             res.status(200).json({
                 message: "Succesfully logged in",
                 token: token
             });
         } else {
-            res.status(400).json({message: "Incorrect email or password"});
+            res.status(400).json({ message: "Incorrect email or password" });
         }
 
     } catch (error) {
-        res.status(400).json({message: "Incorrect email or password"});
+        res.status(400).json({ message: "Incorrect email or password" });
     }
 
 }
@@ -45,12 +45,12 @@ export async function register(req: express.Request, res: express.Response, next
         const hashedUserInfo: IUser = {
             email: userInfo.email,
             password: hashedPassword,
-            claims: [CLAIMS.USER]
+            claims: [claims.USER]
         };
 
         await db.create<IUser>(hashedUserInfo);
-        
-        let token = jwt.sign({email: hashedUserInfo.email}, secret, {
+
+        let token = jwt.sign({ email: hashedUserInfo.email }, secret, {
             expiresIn: "1h"
         });
 
@@ -59,12 +59,11 @@ export async function register(req: express.Request, res: express.Response, next
             token: token
         });
     } catch (error) {
-        let err = error as MongoError
-        res.status(400);
+        let err = error as MongoError;
         if (err.code == 11000) { // Email duplication error
-            res.send("Email already registered");
+            res.status(400).json({ message: "Email already registered" });
         } else {
-            res.send(err.message);
+            res.status(400).json({ message: err.message });
         }
     }
 }

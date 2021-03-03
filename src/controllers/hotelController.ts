@@ -1,6 +1,6 @@
-import express from "express"
-import { Document, Query } from "mongoose";
-import hotelModel, {IHotel, IRoom} from "../models/hotel"
+import express from "express";
+import { Document } from "mongoose";
+import hotelModel, {IHotel, IRoom} from "../models/hotel";
 
 
 // GET /
@@ -12,7 +12,7 @@ export async function getAllHotels(req: express.Request , res: express.Response,
 // POST /
 export async function createHotel(req: express.Request , res: express.Response, next: express.NextFunction) {
     
-    const hotel: IHotel = req.body
+    const hotel: IHotel = req.body;
 
     // userId via webToken
     const user = req.user as {email: string};
@@ -22,8 +22,8 @@ export async function createHotel(req: express.Request , res: express.Response, 
         const result = await hotelModel.create(hotel); 
         res.status(201).send(result);
     } catch (error) {
-        printError("createHotel", error)
-        res.status(400).send(error.message)
+        printError("createHotel", error);
+        res.status(400).send(error.message);
     }
 }
 
@@ -33,8 +33,8 @@ export async function getHotel(req: express.Request , res: express.Response, nex
         const hotel = await hotelModel.findById({_id: req.params.hotelId}); 
         res.status(200).send(hotel);
     } catch (error) {
-        printError("getHotel", error)
-        res.status(404).send(error.message)
+        printError("getHotel", error);
+        res.status(404).send(error.message);
     }
 }
 
@@ -44,8 +44,8 @@ export async function getAllRoomsInHotel(req: express.Request , res: express.Res
         const rooms = await hotelModel.findById({_id: req.params.hotelId}).select("rooms"); 
         res.status(200).send(rooms);
     } catch (error) {
-        printError("getAllRoomsInHotel", error)
-        res.status(404).send(error.message)
+        printError("getAllRoomsInHotel", error);
+        res.status(404).send(error.message);
     }
 }
 
@@ -62,7 +62,7 @@ export async function createRoom(req: express.Request , res: express.Response, n
     try {
         const hotel = await hotelModel.findOne({_id: req.params.hotelId, "hotelManagerId": requestingHotelManagerId});
         if(!hotel) {
-            res.status(403).send("Unauthorized: The given hotel has another hotelManager!")
+            res.status(403).send("Unauthorized: The given hotel has another hotelManager!");
         }
 
         const result = await hotelModel.updateOne(
@@ -70,12 +70,12 @@ export async function createRoom(req: express.Request , res: express.Response, n
             {$push: {"rooms": room}}); 
 
         if(result.nModified === 0){
-            res.status(500).send(`Room with roomNumber=${room.roomNumber} couldn't be created... \nInfo: Either the room (${room.roomNumber}) already exists or the hotel (${hotelId}) doesn't exist`)
+            res.status(500).send(`Room with roomNumber=${room.roomNumber} couldn't be created... \nInfo: Either the room (${room.roomNumber}) already exists or the hotel (${hotelId}) doesn't exist`);
         } else {
             res.status(201).send('Room created!');
         }
     } catch (error) {
-        printError("createRoom", error)
+        printError("createRoom", error);
         res.status(400).send(error.message);
     }
 }
@@ -92,18 +92,18 @@ export async function getRoom(req: express.Request , res: express.Response, next
         
         let roomResult = result?.toObject() as IHotel;
         if(!roomResult) {
-            res.status(404).send(`The hotel with id=${hotelId} doesn't exist`)
+            res.status(404).send(`The hotel with id=${hotelId} doesn't exist`);
         }
 
         let room = roomResult.rooms[0];
         if(!room) {
-            res.status(404).send(`The room with roomNumber=${roomNumber} doesn't exist`)
+            res.status(404).send(`The room with roomNumber=${roomNumber} doesn't exist`);
         }
 
         res.status(200).send(room);
     } catch (error) {
-        printError("getRoom", error)
-        res.status(400).send(error.message)
+        printError("getRoom", error);
+        res.status(400).send(error.message);
     }
 }
 
@@ -130,7 +130,7 @@ export async function reserveRoom(req: express.Request , res: express.Response, 
         }
         
     } catch (error) {
-        printError("reserveRoom", error)
+        printError("reserveRoom", error);
         res.status(400).send(error.message);
     }
 }
@@ -146,7 +146,7 @@ export async function getAvailableRooms(req: express.Request , res: express.Resp
 
         const hotelWithRooms = result?.toObject() as IHotel;
         if(!hotelWithRooms || hotelWithRooms == undefined) {
-            res.status(500).send(`The hotel with id=${hotelId} doesn't exist`)
+            res.status(500).send(`The hotel with id=${hotelId} doesn't exist`);
         }
 
         const availableRooms = hotelWithRooms.rooms.filter(r => r.available == true);
@@ -154,12 +154,12 @@ export async function getAvailableRooms(req: express.Request , res: express.Resp
         res.status(200).send(availableRooms);
     } catch (error) {
         printError("getAvailableRooms", error)
-        res.status(400).send(error.message)
+        res.status(400).send(error.message);
     }
 }
 
 function printError(functionName: string, error: any) {
-    console.log(`** Error from function ${functionName}:`)
+    console.log(`** Error from function ${functionName}:`);
     console.log(error);
 }
 

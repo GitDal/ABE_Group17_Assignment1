@@ -1,7 +1,7 @@
 import express from "express";
 import * as hotelController from "../controllers/hotelController";
 import authorize from "./authorize";
-import CLAIMS from "../constants";
+import claims from "../claims";
 
 const router = express.Router();
 
@@ -106,8 +106,8 @@ const router = express.Router();
  *        description: Bad Request
 */
 router.route('/')
-    .get(authorize([CLAIMS.USER]), hotelController.getAllHotels)
-    .post(authorize([CLAIMS.HOTEL_MANAGER]), hotelController.createHotel)
+    .get(authorize([claims.USER]), hotelController.getAllHotels)
+    .post(authorize([claims.HOTEL_MANAGER]), hotelController.createHotel);
 
 /**
  * @swagger
@@ -133,7 +133,7 @@ router.route('/')
  *      404:
  *        description: Hotel not Found
  */
-router.get('/:hotelId', authorize([CLAIMS.USER]), hotelController.getHotel);
+router.get('/:hotelId', authorize([claims.USER]), hotelController.getHotel);
 
 /**
  * @swagger
@@ -188,8 +188,8 @@ router.get('/:hotelId', authorize([CLAIMS.USER]), hotelController.getHotel);
  *        description: The room couldn't be created
 */
 router.route('/:hotelId/room')
-    .get(authorize([CLAIMS.USER]), hotelController.getAllRoomsInHotel)
-    .post(authorize([CLAIMS.HOTEL_MANAGER]), hotelController.createRoom);
+    .get(authorize([claims.USER]), hotelController.getAllRoomsInHotel)
+    .post(authorize([claims.HOTEL_MANAGER]), hotelController.createRoom);
 
 /**
  * @swagger
@@ -249,8 +249,8 @@ router.route('/:hotelId/room')
  * 
 */
 router.route('/:hotelId/room/:roomNumber')
-    .get(authorize([CLAIMS.USER]), hotelController.getRoom)
-    .put(authorize([CLAIMS.USER]), hotelController.reserveRoom)
+    .get(authorize([claims.USER]), hotelController.getRoom)
+    .put(authorize([claims.USER]), hotelController.reserveRoom);
 
 /**
  * @swagger
@@ -282,6 +282,6 @@ router.route('/:hotelId/room/:roomNumber')
  * 
  * 
 */
-router.get('/:hotelId/available', authorize([CLAIMS.USER]), hotelController.getAvailableRooms);
+router.get('/:hotelId/available', authorize([claims.USER]), hotelController.getAvailableRooms);
 
 export default router;
