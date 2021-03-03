@@ -49,7 +49,7 @@ export async function getAllRoomsInHotel(req: express.Request , res: express.Res
     }
 }
 
-// POST /room/{hotelId}
+// POST {hotelId}/room/
 export async function createRoom(req: express.Request , res: express.Response, next: express.NextFunction) {
     
     const hotelId = req.params.hotelId;
@@ -62,7 +62,7 @@ export async function createRoom(req: express.Request , res: express.Response, n
     try {
         const hotel = await hotelModel.findOne({_id: req.params.hotelId, "hotelManagerId": requestingHotelManagerId});
         if(!hotel) {
-            res.status(401).send("Unauthorized: The given hotel has another hotelManager!")
+            res.status(403).send("Unauthorized: The given hotel has another hotelManager!")
         }
 
         const result = await hotelModel.updateOne(
@@ -70,9 +70,9 @@ export async function createRoom(req: express.Request , res: express.Response, n
             {$push: {"rooms": room}}); 
 
         if(result.nModified === 0){
-            res.status(200).send(`Room with roomNumber=${room.roomNumber} couldn't be created... \nInfo: Either the room (${room.roomNumber}) already exists or the hotel (${hotelId}) doesn't exist`)
+            res.status(500).send(`Room with roomNumber=${room.roomNumber} couldn't be created... \nInfo: Either the room (${room.roomNumber}) already exists or the hotel (${hotelId}) doesn't exist`)
         } else {
-            res.status(201).send(result);
+            res.status(201).send('Room created!');
         }
     } catch (error) {
         printError("createRoom", error)
@@ -124,7 +124,7 @@ export async function reserveRoom(req: express.Request , res: express.Response, 
             {$set: {"rooms.$.available" : false, "rooms.$.reservedByUserId" : reservedByUserId}});
 
         if(result.nModified === 0){
-            res.status(200).send(`Room with roomNumber=${roomNumber} couldn't be reserved (maybe its already reserved)`)
+            res.status(500).send(`Room with roomNumber=${roomNumber} couldn't be reserved (maybe its already reserved)`)
         } else {
             res.status(200).send(`Reserved room with roomNumber ${roomNumber}!`);
         }
@@ -146,7 +146,7 @@ export async function getAvailableRooms(req: express.Request , res: express.Resp
 
         const hotelWithRooms = result?.toObject() as IHotel;
         if(!hotelWithRooms || hotelWithRooms == undefined) {
-            res.status(404).send(`The hotel with id=${hotelId} doesn't exist`)
+            res.status(500).send(`The hotel with id=${hotelId} doesn't exist`)
         }
 
         const availableRooms = hotelWithRooms.rooms.filter(r => r.available == true);
@@ -154,7 +154,7 @@ export async function getAvailableRooms(req: express.Request , res: express.Resp
         res.status(200).send(availableRooms);
     } catch (error) {
         printError("getAvailableRooms", error)
-        res.status(404).send(error.message)
+        res.status(400).send(error.message)
     }
 }
 

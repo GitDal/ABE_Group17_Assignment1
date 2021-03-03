@@ -5,116 +5,282 @@ import CLAIMS from "../constants";
 
 const router = express.Router();
 
+// TAGS :
 /**
  * @swagger
- * /getAllHotels:
+ * tags:
+ *   name: Hotels
+ *   description: API endpoints to manage hotels
+*/
+
+/**
+ * @swagger
+ * tags:
+ *   name: Rooms
+ *   description: API endpoints to manage rooms in a hotel
+*/
+
+// SCHEMAS :
+/**
+ * @swagger
+ * components:
+ *   schemas:
+ *     Hotel:
+ *       type: object
+ *       required:
+ *         - name
+ *         - address
+ *       properties:
+ *         _id:
+ *           type: ObjectId
+ *           description: The auto-generated id of the hotel.
+ *         hotelManagerId:
+ *           type: string
+ *           description: Hotel manager identifier.
+ *           example: "MaryManyMoney@Chardonne.com"
+ *         name:
+ *           type: string
+ *           description: The name of the hotel.
+ *           example: "Chardonne Five Star Hotel"
+ *         address:
+ *           type: string
+ *           description: The address of the hotel.
+ *           example: "Fisherstreet 420, London, UK"
+ *         rooms:
+ *           type: array
+ *           items:
+ *             $ref: '#/components/schemas/Room'
+ *     Room:
+ *       type: object
+ *       required:
+ *         - roomNumber
+ *       properties:
+ *         roomNumber:
+ *           type: integer
+ *           description: The number of the room, must be unique.
+ *           example: 69
+ *         available:
+ *           type: boolean
+ *           description: Whether or not a room is available to reserve.
+ *           example: false
+ *         reservedByUserId:
+ *           type: string
+ *           description: ID of user who has reserved the room, empty if not reserved.
+ *           example: "mikkeljeppe@gmail.com"
+*/
+
+/**
+ * @swagger
+ * /hotel/:
  *  get:
- *    summary: Get a every hotel document with all their rooms.
+ *    summary: Get every hotel document with all their rooms.
+ *    tags: [Hotels]
  *    description: Each hotel document contains an array of rooms.
-*/
-router.get('/', authorize([CLAIMS.USER]), hotelController.getAllHotels)
-
-/**
- * @swagger
- * /createHotel:
+ *    responses:
+ *      200:
+ *        description: The list of hotels
+ *        content:
+ *          application/json:
+ *            schema:
+ *              type: array
+ *              items:
+ *                $ref: '#/components/schemas/Hotel'
  *  post:
- *    summary: Add a new empty hotel document to the database.
- *    description: Add a new empty hotel document to the database.
+ *    summary: Add a new hotel document to the database.
+ *    tags: [Hotels]
+ *    description: Add a new hotel document to the database.
+ *    requestBody:
+ *      required: true
+ *      content:
+ *        application/json:
+ *          schema:
+ *            $ref: '#/components/schemas/Hotel'
+ *    responses:
+ *      201:
+ *        description: The created hotel
+ *        content:
+ *          application/json:
+ *            schema:
+ *              $ref: '#/components/schemas/Hotel'
+ *      400:
+ *        description: Bad Request
 */
-router.post('/', authorize([CLAIMS.HOTEL_MANAGER]), hotelController.createHotel)
+router.route('/')
+    .get(authorize([CLAIMS.USER]), hotelController.getAllHotels)
+    .post(authorize([CLAIMS.HOTEL_MANAGER]), hotelController.createHotel)
 
 /**
  * @swagger
- * /:hotelId:
+ * /hotel/:hotelId:
  *  get:
  *    summary: Get a single specified hotel document.
+ *    tags: [Hotels]
  *    description: Document contains all of that hotels rooms and the hotel's manager's ID.
+ *    parameters:
+ *      - in: path
+ *        name: hotelId
+ *        schema:
+ *          type: ObjectId
+ *          required: true
+ *          description: The hotel id
  *    responses:
  *      200:
  *        description: A hotel document.
  *        content:
  *          application/json:
  *            schema:
- *              type: object
- *              properties:
- *                _id:
- *                  type: string
- *                  description: Hotel identifier.
- *                  example: "603d2d13928e1485b4f0de9f"
- *                hotelManagerId:
- *                  type: string
- *                  description: Hotel manager identifier.
- *                  example: "MaryManyMoney@Chardonne.com"
- *                name:
- *                  type: string
- *                  description: The name of the hotel.
- *                  example: "Chardonne Five Star Hotel"
- *                address:
- *                  type: string
- *                  description: The address of the hotel.
- *                  example: "Fisherstreet 420, London, UK"
- *                rooms:
- *                  type: array
- *                  items:
- *                    type: object
- *                    properties:
- *                      roomNumber:
- *                        type: integer
- *                        description: The number of the room, must be unique.
- *                        example: 69
- *                      available:
- *                        type: boolean
- *                        description: Whether or not a room is available to reserve.
- *                        example: false
- *                      reservedByUserId:
- *                        type: string
- *                        description: ID of user who has reserved the room, empty if not reserved.
- *                        example: "mikkeljeppe@gmail.com"
+ *              $ref: '#/components/schemas/Hotel'
+ *      404:
+ *        description: Hotel not Found
  */
 router.get('/:hotelId', authorize([CLAIMS.USER]), hotelController.getHotel);
 
 /**
  * @swagger
- * /:hotelId/room:
+ * /hotel/:hotelId/room:
  *  get:
  *    summary: Get an array of every room in a given hotel.
+ *    tags: [Rooms]
  *    description: Get an array of every room in a given hotel.
-*/
-router.get('/:hotelId/room', authorize([CLAIMS.USER]), hotelController.getAllRoomsInHotel);
-
-/**
- * @swagger
- * /:hotelId/room:
+ *    parameters:
+ *      - in: path
+ *        name: hotelId
+ *        schema:
+ *          type: ObjectId
+ *          required: true
+ *          description: The hotel id
+ *    responses:
+ *      200:
+ *        description: The list of rooms in the given hotel
+ *        content:
+ *          application/json:
+ *            schema:
+ *              type: array
+ *              items:
+ *                $ref: '#/components/schemas/Room'
+ *      404:
+ *        description: Hotel not found, therefore no rooms are displayed
  *  post:
  *    summary: Insert a new room in the specified hotel document.
- *    description: Room should include roomNumber, availability and a reservedByUserId. 
+ *    tags: [Rooms]
+ *    description: Room should include roomNumber, availability and a reservedByUserId.
+ *    parameters:
+ *      - in: path
+ *        name: hotelId
+ *        schema:
+ *          type: ObjectId
+ *          required: true
+ *          description: The hotel id
+ *    requestBody:
+ *      required: true
+ *      content:
+ *        application/json:
+ *          schema:
+ *            $ref: '#/components/schemas/Room'
+ *    responses:
+ *      201:
+ *        description: The room was created
+ *      400:
+ *        description: Bad Request
+ *      403:
+ *        description: Forbidden (The user wasn't the hotelManager for the given hotel)
+ *      500:
+ *        description: The room couldn't be created
 */
-router.post('/:hotelId/room', authorize([CLAIMS.HOTEL_MANAGER]), hotelController.createRoom);
+router.route('/:hotelId/room')
+    .get(authorize([CLAIMS.USER]), hotelController.getAllRoomsInHotel)
+    .post(authorize([CLAIMS.HOTEL_MANAGER]), hotelController.createRoom);
 
 /**
  * @swagger
- * /:hotelId/room/:roomNumber:
+ * /hotel/:hotelId/room/:roomNumber:
  *  get:
  *    summary: Get a specified room in a specified hotel.
+ *    tags: [Rooms]
  *    description: Get a specified room in a specified hotel.
-*/
-router.get('/:hotelId/room/:roomNumber', authorize([CLAIMS.USER]), hotelController.getRoom);
-
-/**
- * @swagger
- * /:hotelId/room/:roomNumber:
+ *    parameters:
+ *      - in: path
+ *        name: hotelId
+ *        schema:
+ *          type: ObjectId
+ *          required: true
+ *          description: The hotel id
+ *      - in: path
+ *        name: roomNumber
+ *        schema:
+ *          type: integer
+ *          required: true
+ *          description: The room number
+ *    responses:
+ *      200:
+ *        description: A room document.
+ *        content:
+ *          application/json:
+ *            schema:
+ *              $ref: '#/components/schemas/Room'
+ *      400:
+ *        description: Bad Request
+ *      404:
+ *        description: Room not Found
  *  put:
  *    summary: Change the availability of a specified room in a specified hotel.
+ *    tags: [Rooms]
  *    description: Change the availability of a specified room in a specified hotel.
+ *    parameters:
+ *      - in: path
+ *        name: hotelId
+ *        schema:
+ *          type: ObjectId
+ *          required: true
+ *          description: The hotel id
+ *      - in: path
+ *        name: roomNumber
+ *        schema:
+ *          type: integer
+ *          required: true
+ *          description: The room number
+ *    responses:
+ *      200:
+ *        description: The room was reserved (updated)
+ *      400:
+ *        description: Bad Request
+ *      500:
+ *        description: The room couldn't be reserved (updated)
+ * 
 */
-router.put('/:hotelId/room/:roomNumber', authorize([CLAIMS.USER]), hotelController.reserveRoom)
+router.route('/:hotelId/room/:roomNumber')
+    .get(authorize([CLAIMS.USER]), hotelController.getRoom)
+    .put(authorize([CLAIMS.USER]), hotelController.reserveRoom)
 
 /**
  * @swagger
- * /:hotelId/available:
+ * /hotel/:hotelId/available:
  *  get:
  *    summary: Get all available rooms in a specified hotel.
+ *    tags: [Rooms]
  *    description: Get all available rooms in a specified hotel.
+ *    parameters:
+ *      - in: path
+ *        name: hotelId
+ *        schema:
+ *          type: ObjectId
+ *          required: true
+ *          description: The hotel id
+ *    responses:
+ *      200:
+ *        description: The list of available rooms in the given hotel
+ *        content:
+ *          application/json:
+ *            schema:
+ *              type: array
+ *              items:
+ *                $ref: '#/components/schemas/Room'
+ *      400:
+ *        description: Bad Request
+ *      500:
+ *        description: Internal server error (hotel couldn't be found)
+ * 
+ * 
 */
 router.get('/:hotelId/available', authorize([CLAIMS.USER]), hotelController.getAvailableRooms);
 

@@ -30,8 +30,14 @@ const roomSchema = new Schema({
 
 const hotelSchema = new Schema({
     hotelManagerId: String,
-    name: String,
-    address: String,
+    name: {
+        type: String,
+        required: true
+    },
+    address: {
+        type: String,
+        required: true
+    },
     rooms: [roomSchema]
 });
 
