@@ -61,7 +61,8 @@ const router = express.Router();
  *                  type: string
  *                  description: error message
  *                  example: "User not found"
- *                
+ *      401:
+ *        description: Unauthorized            
  */
 router.post('/giveClaims', authorize([claims.ADMIN]), userController.giveClaims);
 
