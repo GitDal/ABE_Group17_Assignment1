@@ -4,8 +4,8 @@
   "description": "",
   "main": "dist/app.js",
   "scripts": {
-    "start": "tsc && nodemon dist/app.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node dist/app.js",
+    "serve": "tsc && nodemon dist/app.js"
   },
   "engines": {
     "node": "^14.15.4",
